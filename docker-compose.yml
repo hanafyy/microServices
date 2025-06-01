@@ -1,0 +1,82 @@
+version: "3.9"
+
+services:
+  user-service:
+    build: ./userService
+    container_name: user-service
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./userService/.env
+    depends_on:
+      - mongo-user
+    networks:
+      - micro-net
+
+  mongo-user:
+    image: mongo:8.0
+    container_name: mongo-user
+    restart: always
+    ports:
+      - "27018:27017" # MongoDB for user-service
+    volumes:
+      - mongo-user-data:/data/db
+    networks:
+      - micro-net
+
+  product-service:
+    build: ./productService
+    container_name: product-service
+    ports:
+      - "5001:5001"
+    env_file:
+      - ./productService/.env
+    depends_on:
+      - mongo-product
+    networks:
+      - micro-net
+
+  mongo-product:
+    image: mongo:8.0
+    container_name: mongo-product
+    restart: always
+    ports:
+      - "27019:27017" # MongoDB for product-service
+    volumes:
+      - mongo-product-data:/data/db
+    networks:
+      - micro-net
+
+  order-service:
+    build: ./orderService
+    container_name: order-service
+    ports:
+      - "5002:5002"
+    env_file:
+      - ./orderService/.env
+    depends_on:
+      - mongo-order
+      - user-service
+      - product-service
+    networks:
+      - micro-net
+
+  mongo-order:
+    image: mongo:8.0
+    container_name: mongo-order
+    restart: always
+    ports:
+      - "27020:27017" # MongoDB for order-service
+    volumes:
+      - mongo-order-data:/data/db
+    networks:
+      - micro-net
+
+volumes:
+  mongo-user-data:
+  mongo-product-data:
+  mongo-order-data:
+
+networks:
+  micro-net:
+    driver: bridge
