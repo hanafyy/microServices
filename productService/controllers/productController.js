@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Product = require("../models/product");
 
 // GET /products
@@ -8,19 +9,17 @@ exports.getAllProducts = async (req, res) => {
 
 // GET /products/:id
 exports.getProduct = async (req, res) => {
-  exports.getProduct = async (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    // Check for valid ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Invalid product ID format" });
-    }
+  // Check for valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "Invalid product ID format" });
+  }
 
-    const product = await Product.findById(id);
-    if (!product) return res.status(404).json({ error: "Product not found" });
+  const product = await Product.findById(id);
+  if (!product) return res.status(404).json({ error: "Product not found" });
 
-    res.json({ status: "success", data: product });
-  };
+  res.json({ status: "success", data: product });
 };
 
 // POST /products
